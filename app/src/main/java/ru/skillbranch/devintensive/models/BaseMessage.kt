@@ -1,7 +1,6 @@
 package ru.skillbranch.devintensive.models
 
 import java.util.*
-import kotlin.reflect.typeOf
 
 abstract class BaseMessage(
     val id: String,

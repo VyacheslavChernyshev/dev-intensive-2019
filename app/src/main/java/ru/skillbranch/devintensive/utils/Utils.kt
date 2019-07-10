@@ -1,7 +1,5 @@
 package ru.skillbranch.devintensive.utils
 
-import android.service.voice.AlwaysOnHotwordDetector
-
 object Utils {
     private var translitTable = mutableMapOf(
         "а" to "a",
