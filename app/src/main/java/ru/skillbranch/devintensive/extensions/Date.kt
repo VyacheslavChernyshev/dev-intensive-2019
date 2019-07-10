@@ -35,13 +35,13 @@ fun Date.humanizeDiff(date: Date = Date()): String {
     result +=
         when (timeDiff) {
             in 0L..(1 * SECOND) -> "только что"
-            in (1 * SECOND)..(45 * SECOND) -> "${if (isFuture) "через " else ""}несколько секунд${if (isFuture) "" else "назад"}"
-            in (45 * SECOND)..(75 * SECOND) -> "${if (isFuture) "через " else ""}минуту${if (isFuture) "" else "назад"}"
-            in (75 * SECOND)..(45 * MINUTE) -> "${if (isFuture) "через " else ""}${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())} ${if (isFuture) "" else "назад"}"
-            in (45 * MINUTE)..(75 * MINUTE) -> "${if (isFuture) "через " else ""}час${if (isFuture) "" else "назад"}"
-            in (75 * MINUTE)..(22 * HOUR) -> "${if (isFuture) "через " else ""}${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())} ${if (isFuture) "" else "назад"}"
-            in (22 * HOUR)..(26 * HOUR) -> "${if (isFuture) "через " else ""}день${if (isFuture) "" else "назад"}"
-            in (26 * HOUR)..(360 * DAY) -> "${if (isFuture) "через " else ""}${TimeUnits.DAY.plural((timeDiff / DAY).toInt())} ${if (isFuture) "" else "назад"}"
+            in (1 * SECOND)..(45 * SECOND) -> if (isFuture) "через несколько секунд" else "несколько секунд назад"
+            in (45 * SECOND)..(75 * SECOND) -> if (isFuture) "через минуту" else "минуту назад"
+            in (75 * SECOND)..(45 * MINUTE) -> if (isFuture) "через ${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())}" else "${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())} назад"
+            in (45 * MINUTE)..(75 * MINUTE) -> if (isFuture) "через час" else "час назад"
+            in (75 * MINUTE)..(22 * HOUR) -> if (isFuture) "через ${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())}" else "${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())} назад"
+            in (22 * HOUR)..(26 * HOUR) -> if (isFuture) "через день" else "день назад"
+            in (26 * HOUR)..(360 * DAY) -> if (isFuture) "через ${TimeUnits.DAY.plural((timeDiff / DAY).toInt())}" else "${TimeUnits.DAY.plural((timeDiff / DAY).toInt())} назад"
             else -> if (isFuture) "более чем через год" else "более года назад"
         }
     return result
@@ -51,20 +51,20 @@ enum class TimeUnits {
     SECOND,
     MINUTE,
     HOUR,
-    DAY
+    DAY;
+    fun plural(i: Int): String? {
+        val pluralMultipl = when {
+            i % 10 == 1 && i % 100 != 11 -> 0
+            i % 10 in 2..4 && (i % 100 < 10 || i % 100 >= 20) -> 1
+            else -> 2
+        }
+        return when (this) {
+            SECOND -> "$i ${if (pluralMultipl == 0) "секунду" else if (pluralMultipl == 1) "секунды" else "секунд"}"
+            MINUTE -> "$i ${if (pluralMultipl == 0) "минуту" else if (pluralMultipl == 1) "минуты" else "минут"}"
+            HOUR -> "$i ${if (pluralMultipl == 0) "час" else if (pluralMultipl == 1) "часа" else "часов"}"
+            DAY -> "$i ${if (pluralMultipl == 0) "день" else if (pluralMultipl == 1) "дня" else "дней"}"
+        }
+    }
+
 }
 
-fun TimeUnits.plural(i: Int): String? {
-    //Падеж и число
-    val pluralMultipl = when {
-        i % 10 == 1 && i % 100 != 11 -> 0
-        i % 10 in 2..4 && (i % 100 < 10 || i % 100 >= 20) -> 1
-        else -> 2
-    }
-    return when (this) {
-        TimeUnits.SECOND -> "$i ${if (pluralMultipl == 0) "секунду" else if (pluralMultipl == 1) "секунды" else "секунд"}"
-        TimeUnits.MINUTE -> "$i ${if (pluralMultipl == 0) "минуту" else if (pluralMultipl == 1) "минуты" else "минут"}"
-        TimeUnits.HOUR -> "$i ${if (pluralMultipl == 0) "час" else if (pluralMultipl == 1) "часа" else "часов"}"
-        TimeUnits.DAY -> "$i ${if (pluralMultipl == 0) "день" else if (pluralMultipl == 1) "дня" else "дней"}"
-    }
-}
