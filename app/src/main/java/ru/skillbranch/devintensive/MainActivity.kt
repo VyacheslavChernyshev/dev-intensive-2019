@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val status = savedInstanceState?.getString("STATUS") ?: Bender.Status.NORMAL.name
         val question = savedInstanceState?.getString("QUESTION") ?: Bender.Question.NAME.name
         benderObj = Bender(Bender.Status.valueOf(status), Bender.Question.valueOf(question))
+        benderObj.failsCount = savedInstanceState?.getInt("FailsCount") ?: 0
         Log.d("M_MainActivity", "onCreate ${benderObj.status.name}, ${benderObj.question.name}")
 
         val (r, g, b) = benderObj.status.color
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onSaveInstanceState(outState)
         outState?.putString("STATUS", benderObj.status.name)
         outState?.putString("QUESTION", benderObj.question.name)
-
+        outState?.putInt("FailsCount", benderObj.failsCount)
         Log.d("M_MainActivity", "onSaveInstanceState ${benderObj.status.name}, ${benderObj.question.name}")
     }
 }
