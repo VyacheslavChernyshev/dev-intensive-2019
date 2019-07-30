@@ -1,21 +1,23 @@
 package ru.skillbranch.devintensive.ui.profile
 
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_profile.*
 import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.models.Profile
 import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
+import kotlin.math.roundToInt
 
 class ProfileActivity : AppCompatActivity() {
     companion object {
@@ -27,7 +29,7 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var viewFields: Map<String, TextView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO set custom theme this
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         initViews(savedInstanceState)
@@ -42,7 +44,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
         viewModel.getProfileData().observe(this, Observer { updateUI(it) })
-        viewModel.getAppTheme().observe(this, Observer { updateTheme(it)  })
+        viewModel.getAppTheme().observe(this, Observer { updateTheme(it) })
     }
 
     private fun updateUI(profile: Profile) {
@@ -50,6 +52,7 @@ class ProfileActivity : AppCompatActivity() {
             for ((k, v) in viewFields) {
                 v.text = it[k].toString()
             }
+            iv_avatar.setImageDrawable(getInitialsDrawable(profile))
         }
 
     }
@@ -75,8 +78,8 @@ class ProfileActivity : AppCompatActivity() {
         showCurrentMode(isEditMode)
 
         btn_edit.setOnClickListener {
-            isEditMode = !isEditMode
             if (isEditMode) saveProfileInfo()
+            isEditMode = !isEditMode
             showCurrentMode(isEditMode)
         }
 
@@ -126,5 +129,36 @@ class ProfileActivity : AppCompatActivity() {
         ).apply {
             viewModel.saveProfileData(this)
         }
+    }
+
+    private fun getInitialsDrawable(
+        profile: Profile,
+        fontSize: Float = 64f,
+        fontColor: Int = Color.WHITE
+    ): Drawable {
+        if (profile.initials.isEmpty()) return resources.getDrawable(R.drawable.avatar_default, theme)
+        
+        val dp = resources.displayMetrics.density
+        val width = resources.getDimension(R.dimen.avatar_round_size)
+        val height = resources.getDimension(R.dimen.avatar_round_size)
+        @ColorRes val accentColor: Int = getAccentColorTheme()
+
+        val bitmap = Bitmap.createBitmap((width * dp).roundToInt(), (height * dp).roundToInt(), Bitmap.Config.ARGB_8888)
+        val paint = Paint()
+        with(paint) {
+            textSize = fontSize * dp
+            color = fontColor
+            textAlign = Paint.Align.CENTER
+        }
+        bitmap.eraseColor(accentColor)
+        val canvas = Canvas(bitmap)
+        canvas.drawText(profile.initials, width / 2 * dp, height / 2 * dp + paint.textSize / 3, paint)
+        return BitmapDrawable(resources, bitmap)
+    }
+
+    private fun getAccentColorTheme(): Int {
+        val accentColorTV = TypedValue()
+        theme.resolveAttribute(R.attr.colorAccent, accentColorTV, true)
+        return accentColorTV.data
     }
 }
