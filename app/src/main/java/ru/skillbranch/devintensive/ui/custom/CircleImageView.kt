@@ -1,10 +1,9 @@
 package ru.skillbranch.devintensive.ui.custom
 
 import android.content.Context
+import android.graphics.*
 import android.util.AttributeSet
 import android.widget.ImageView
-import android.graphics.Paint.ANTI_ALIAS_FLAG
-import android.graphics.*
 import androidx.annotation.ColorRes
 import androidx.annotation.Dimension
 import ru.skillbranch.devintensive.R
@@ -63,13 +62,12 @@ class CircleImageView @JvmOverloads constructor(
     }
 
     fun setBorderColor(@ColorRes colorRes: Int) {
-        setBorderColorInt(resources.getColor(colorRes, context.theme))
+        setBorderColorInt(context.getColor(colorRes))
     }
 
     fun setBorderColor(hex: String) {
-        val color: Int? = hex.toIntOrNull(16)
-        if (color != null)
-            setBorderColorInt(color)
+        paintBorder.color = Color.parseColor(hex)
+        invalidate()
     }
 
     @Dimension(unit = Dimension.DP)

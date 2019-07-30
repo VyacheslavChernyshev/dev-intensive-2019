@@ -137,7 +137,7 @@ class ProfileActivity : AppCompatActivity() {
         fontColor: Int = Color.WHITE
     ): Drawable {
         if (profile.initials.isEmpty()) return resources.getDrawable(R.drawable.avatar_default, theme)
-        
+
         val dp = resources.displayMetrics.density
         val width = resources.getDimension(R.dimen.avatar_round_size)
         val height = resources.getDimension(R.dimen.avatar_round_size)
