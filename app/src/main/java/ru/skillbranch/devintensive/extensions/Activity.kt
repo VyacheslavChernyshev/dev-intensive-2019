@@ -27,6 +27,5 @@ fun Activity.isKeyboardOpen(): Boolean {
 fun Activity.isKeyboardClosed(): Boolean = !isKeyboardOpen()
 
 fun Context.dpToPx(valueInDp: Float): Float {
-    val metrics = this.getResources().getDisplayMetrics()
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, resources.displayMetrics)
 }
