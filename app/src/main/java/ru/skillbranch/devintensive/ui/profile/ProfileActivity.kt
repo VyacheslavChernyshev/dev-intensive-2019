@@ -4,6 +4,8 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -16,16 +18,19 @@ import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_profile.*
 import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.models.Profile
+import ru.skillbranch.devintensive.utils.Utils
 import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
 import kotlin.math.roundToInt
 
 class ProfileActivity : AppCompatActivity() {
     companion object {
         const val IS_EDIT_MODE = "IS_EDIT_MODE"
+        const val IS_REPO_ERROR = "IS_REPO_ERROR"
     }
 
     private lateinit var viewModel: ProfileViewModel
     var isEditMode = false
+    var isRepoError = false
     lateinit var viewFields: Map<String, TextView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +44,7 @@ class ProfileActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(IS_EDIT_MODE, isEditMode)
+        outState.putBoolean(IS_REPO_ERROR, isRepoError)
     }
 
     private fun initViewModel() {
@@ -75,10 +81,16 @@ class ProfileActivity : AppCompatActivity() {
         )
 
         isEditMode = savedInstanceState?.getBoolean(IS_EDIT_MODE, false) ?: false
+        isRepoError = savedInstanceState?.getBoolean(IS_REPO_ERROR, false) ?: false
         showCurrentMode(isEditMode)
 
         btn_edit.setOnClickListener {
-            if (isEditMode) saveProfileInfo()
+            if (isEditMode) {
+                if (isRepoError) {
+                    et_repository.text.clear()
+                }
+                saveProfileInfo()
+            }
             isEditMode = !isEditMode
             showCurrentMode(isEditMode)
         }
@@ -86,6 +98,27 @@ class ProfileActivity : AppCompatActivity() {
         btn_switch_theme.setOnClickListener {
             viewModel.switchTheme()
         }
+
+        et_repository.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!Utils.isValidGitHubURL(s.toString())) {
+                    isRepoError = true
+                    wr_repository.isErrorEnabled = true
+                    wr_repository.error = "Невалидный адрес репозитория"
+                } else {
+                    isRepoError = false
+                    wr_repository.isErrorEnabled = false
+                    wr_repository.error = ""
+                }
+
+            }
+        })
     }
 
     private fun showCurrentMode(isEdit: Boolean) {
@@ -161,4 +194,5 @@ class ProfileActivity : AppCompatActivity() {
         theme.resolveAttribute(R.attr.colorAccent, accentColorTV, true)
         return accentColorTV.data
     }
+
 }

@@ -67,11 +67,35 @@ object Utils {
             payload.forEach {
                 append(
                     when {
-                        it.isUpperCase() -> translitTable[it.toLowerCase().toString()]?.toUpperCase() ?: it.toUpperCase()
+                        it.isUpperCase() -> translitTable[it.toLowerCase().toString()]?.toUpperCase()
+                            ?: it.toUpperCase()
                         else -> translitTable[it.toLowerCase().toString()] ?: it.toString()
                     }
                 )
             }
         }
     }
+
+    fun isValidGitHubURL(url: String): Boolean {
+        var invalidUserNames = listOf(
+            "enterprise",
+            "features",
+            "topics",
+            "collections",
+            "trending",
+            "events",
+            "marketplace",
+            "pricing",
+            "nonprofit",
+            "customer-stories",
+            "security",
+            "login",
+            "join"
+        )
+        val rx = Regex("^(https://)?(www\\.)?(github\\.com)/([a-zA-Z0-9_-]+)$")
+        return url.isBlank() || rx.find(url)?.groupValues?.get(4)?.toLowerCase()?.let {
+            invalidUserNames.contains(it).not()
+        } ?: false
+    }
+
 }
