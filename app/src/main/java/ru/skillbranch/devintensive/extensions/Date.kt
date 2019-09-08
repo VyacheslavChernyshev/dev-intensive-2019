@@ -15,6 +15,17 @@ fun Date.format(pattern: String = "HH:mm:ss dd.MM.yy"): String {
     return dateFormat.format(this)
 }
 
+fun Date.shortFormat(): String? {
+    val pattern = if (this.isSameDate(Date())) "HH:mm" else "dd.MM.yy"
+    return this.format(pattern)
+}
+
+fun Date.isSameDate(date: Date): Boolean {
+    val day1 = this.time / DAY
+    val day2 = date.time / DAY
+    return day1 == day2
+}
+
 fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date {
     var time = this.time
     time += when (units) {
@@ -37,11 +48,17 @@ fun Date.humanizeDiff(date: Date = Date()): String {
             in 0L..(1 * SECOND) -> "только что"
             in (1 * SECOND)..(45 * SECOND) -> if (isFuture) "через несколько секунд" else "несколько секунд назад"
             in (45 * SECOND)..(75 * SECOND) -> if (isFuture) "через минуту" else "минуту назад"
-            in (75 * SECOND)..(45 * MINUTE) -> if (isFuture) "через ${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())}" else "${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())} назад"
+            in (75 * SECOND)..(45 * MINUTE) -> if (isFuture) "через ${TimeUnits.MINUTE.plural((timeDiff / MINUTE).toInt())}" else "${TimeUnits.MINUTE.plural(
+                (timeDiff / MINUTE).toInt()
+            )} назад"
             in (45 * MINUTE)..(75 * MINUTE) -> if (isFuture) "через час" else "час назад"
-            in (75 * MINUTE)..(22 * HOUR) -> if (isFuture) "через ${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())}" else "${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())} назад"
+            in (75 * MINUTE)..(22 * HOUR) -> if (isFuture) "через ${TimeUnits.HOUR.plural((timeDiff / HOUR).toInt())}" else "${TimeUnits.HOUR.plural(
+                (timeDiff / HOUR).toInt()
+            )} назад"
             in (22 * HOUR)..(26 * HOUR) -> if (isFuture) "через день" else "день назад"
-            in (26 * HOUR)..(360 * DAY) -> if (isFuture) "через ${TimeUnits.DAY.plural((timeDiff / DAY).toInt())}" else "${TimeUnits.DAY.plural((timeDiff / DAY).toInt())} назад"
+            in (26 * HOUR)..(360 * DAY) -> if (isFuture) "через ${TimeUnits.DAY.plural((timeDiff / DAY).toInt())}" else "${TimeUnits.DAY.plural(
+                (timeDiff / DAY).toInt()
+            )} назад"
             else -> if (isFuture) "более чем через год" else "более года назад"
         }
     return result
@@ -52,6 +69,7 @@ enum class TimeUnits {
     MINUTE,
     HOUR,
     DAY;
+
     fun plural(i: Int): String? {
         val pluralMultipl = when {
             i % 10 == 1 && i % 100 != 11 -> 0
@@ -67,4 +85,3 @@ enum class TimeUnits {
     }
 
 }
-
